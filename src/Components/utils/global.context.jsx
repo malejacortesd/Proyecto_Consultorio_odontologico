@@ -1,32 +1,66 @@
-import { response } from "msw";
-import { createContext, useMemo, useState } from "react";
+import { useContext, useReducer } from "react";
+import { useState } from "react";
+import { createContext, useEffect } from "react";
 
-export const initialState = { theme: "light", data: [] }
 
-export const ContextGlobal = createContext(initialState);
+const ContextGlobal = createContext();
+
+//export const initialState = {theme: "", data: []}
+const themes = {
+  dark: {
+    theme: false,
+    bgColor: 'black',
+    color: 'white',
+    icon: "☼",
+    background: "rgb(72, 201, 176)",
+    colorf: "rgb(0, 0, 0)"
+  },
+  light: {
+    theme: true,
+    bgColor: 'white',
+    color: 'black',
+    icon: "☾",
+    background: "rgb(129, 140, 248)",
+    colorf: "rgb(0, 0, 0)"
+
+  }
+}
+const initialThemeState = themes.light
+
+const themeReducer = (state, action) => {
+  switch (action.type) {
+    case 'Switch-Dark':
+      return state = themes.dark
+    case 'Switch-Light':
+      return state = themes.light
+    default:
+      return state = themes.dark
+  }
+}
 
 export const ContextProvider = ({ children }) => {
-  //Aqui deberan implementar la logica propia del Context, utilizando el hook useMemo
+  //Aqui deberan implementar la logica propia del Context.
+  const [themeState, setDispatch] = useReducer(themeReducer, initialThemeState)
+  const [dentists, setDentists] = useState([{}])
 
 
-  const otraData = useMemo(()=>{
-    const getDentists = async() =>{
-      const data = await fetch ('https://jsonplaceholder.typicode.com/users')
-      .then((response)=>{
-    return response.json()
-      })
-      return(data)
-  }
-  return getDentists()
-  },[])
+  const url = "https://jsonplaceholder.typicode.com/users"
 
-  const [theme, setTheme] =useState('')
-  const [data, setData] = useState ([])
+  useEffect(() => {
+    fetch(url)
+      .then(response => response.json())
+      .then(data => setDentists(data))
+  }, [])
+
+  //console.log(dentists)
 
 
-return (
-  <ContextGlobal.Provider value={{theme, setTheme, setData}}>
-    {children}
-  </ContextGlobal.Provider>
-);
+
+  return (
+    <ContextGlobal.Provider value={{ dentists, setDentists, themeState, setDispatch }}>
+      {children}
+    </ContextGlobal.Provider>
+  );
 };
+
+export const useContextGlobal = () => useContext(ContextGlobal)

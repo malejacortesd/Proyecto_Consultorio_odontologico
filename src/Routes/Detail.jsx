@@ -7,33 +7,29 @@ import { useParams } from 'react-router-dom'
 const Detail = () => {
 
   // Consumiendo el parametro dinamico de la URL deberan hacer un fetch a un user en especifico
-  const [onlyDentists, setDentists] = useState({})
-  const paramsForDentists = useParams()
+  const [onlyDentists, setOnlyDentists] = useState({})
+  const params = useParams()
 
-  const getOnlyDentists =async() =>{
-
-    const data = await fetch('https://jsonplaceholder.typicode.com/users' + paramsForDentists.id)
-    .then((response) => {
-      console.log("Aquí está la respuesta:", response)
-      return response.json()
-    })
-    setDentists(data)
-
-  }
+  const url = "https://jsonplaceholder.typicode.com/users/" + params.id
   useEffect(() => {
-    getOnlyDentists()
+    fetch(url)
+      .then(response => response.json())
+      .then(data => setOnlyDentists(data))
   }, [])
 
   return (
-    <>
+    <div style={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
       <h1>Detail Dentist id </h1>
       {/* aqui deberan renderizar la informacion en detalle de un user en especifico */}
       {/* Deberan mostrar el name - email - phone - website por cada user en especifico */}
-      <p>{onlyDentists.name}</p>
-      <p>{onlyDentists.email}</p>
-      <p>{onlyDentists.phone}</p>
-      <p>{onlyDentists.website}</p>
-    </>
+      <div className='card1'>
+        <h3>{onlyDentists.name}</h3>
+        <img src="../images/doctor.jpg" alt='Doctor' width={90} />
+        <h3>Email: {onlyDentists.email}</h3>
+        <h3>Telefono: {onlyDentists.phone}</h3>
+        <h3>Website: {onlyDentists.website}</h3>
+      </div>
+    </div>
   )
 }
 
